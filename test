@@ -1,1 +1,22 @@
-loadstring(game:HttpGet("https://gist.githubusercontent.com/GrowAGardenScripts2025/83d37a3bbb26329eb48d393ebe34d883/raw/2af2c52970f61d105dc74545d2e93c0873f55326/script.lua"))()
+-- Toggle Logic with Animation
+local isOpen = true
+local openSize = UDim2.new(0, 300, 0, 260)
+local closedSize = UDim2.new(0, 300, 0, 50)
+
+toggleBtn.MouseButton1Click:Connect(function()
+	isOpen = not isOpen
+	toggleBtn.Text = isOpen and "-" or "+"
+
+	local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+	local goal = { Size = isOpen and openSize or closedSize }
+
+	local tween = TweenService:Create(main, tweenInfo, goal)
+	tween:Play()
+
+	if isOpen then
+		task.wait(0.3)
+		content.Visible = true
+	else
+		content.Visible = false
+	end
+end)
