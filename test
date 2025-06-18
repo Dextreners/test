@@ -1,3 +1,153 @@
+-- Load Spawner Module
+local Spawner = loadstring(game:HttpGet("https://raw.githubusercontent.com/ataturk123/GardenSpawner/refs/heads/main/Spawner.lua"))()
+
+-- Player & GUI Setup
+local player = game.Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local screenGui = Instance.new("ScreenGui", playerGui)
+screenGui.Name = "NeroPetSpawner"
+screenGui.ResetOnSpawn = false
+screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+-- Main Frame
+local main = Instance.new("Frame")
+main.Size = UDim2.new(0, 300, 0, 260)
+main.Position = UDim2.new(0.5, -150, 0.5, -130)
+main.BackgroundColor3 = Color3.fromRGB(255, 204, 77)
+main.BorderSizePixel = 0
+main.Parent = screenGui
+Instance.new("UICorner", main).CornerRadius = UDim.new(0, 12)
+
+-- Dragging
+local dragging, dragInput, dragStart, startPos
+
+main.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = true
+		dragStart = input.Position
+		startPos = main.Position
+
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
+	end
+end)
+
+main.InputChanged:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseMovement then
+		dragInput = input
+	end
+end)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+	if input == dragInput and dragging then
+		local delta = input.Position - dragStart
+		main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X,
+			startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+	end
+end)
+
+-- Title Bar
+local title = Instance.new("TextLabel", main)
+title.Size = UDim2.new(1, -40, 0, 30)
+title.Position = UDim2.new(0, 10, 0, 10)
+title.Text = "NERO PET SPAWNER 2.5 🌻"
+title.Font = Enum.Font.GothamBold
+title.TextSize = 18
+title.BackgroundTransparency = 1
+title.TextColor3 = Color3.new(1,1,1)
+title.TextXAlignment = Enum.TextXAlignment.Left
+
+-- Minimize Button
+local toggleBtn = Instance.new("TextButton", main)
+toggleBtn.Size = UDim2.new(0, 30, 0, 30)
+toggleBtn.Position = UDim2.new(1, -40, 0, 10)
+toggleBtn.Text = "-"
+toggleBtn.Font = Enum.Font.GothamBold
+toggleBtn.TextSize = 20
+toggleBtn.TextColor3 = Color3.new(1,1,1)
+toggleBtn.BackgroundColor3 = Color3.fromRGB(200, 100, 0)
+Instance.new("UICorner", toggleBtn).CornerRadius = UDim.new(0, 6)
+
+-- Container for the rest of content
+local content = Instance.new("Frame", main)
+content.Size = UDim2.new(1, 0, 0, 200)
+content.Position = UDim2.new(0, 0, 0, 50)
+content.BackgroundTransparency = 1
+
+-- Tabs
+local petTab = Instance.new("TextButton", content)
+petTab.Size = UDim2.new(0.45, 0, 0, 30)
+petTab.Position = UDim2.new(0.05, 0, 0, 0)
+petTab.Text = "PETS"
+petTab.BackgroundColor3 = Color3.fromRGB(255, 128, 0)
+petTab.Font = Enum.Font.GothamBold
+petTab.TextColor3 = Color3.new(1,1,1)
+Instance.new("UICorner", petTab).CornerRadius = UDim.new(0, 6)
+
+local seedTab = petTab:Clone()
+seedTab.Text = "SEEDS"
+seedTab.Position = UDim2.new(0.5, 0, 0, 0)
+seedTab.Parent = content
+
+-- Pet Name
+local nameBox = Instance.new("TextBox", content)
+nameBox.PlaceholderText = "Raccoon"
+nameBox.Text = ""
+nameBox.Size = UDim2.new(0.9, 0, 0, 30)
+nameBox.Position = UDim2.new(0.05, 0, 0, 40)
+nameBox.BackgroundColor3 = Color3.fromRGB(255, 153, 102)
+nameBox.TextColor3 = Color3.new(1,1,1)
+nameBox.Font = Enum.Font.Gotham
+nameBox.TextSize = 14
+Instance.new("UICorner", nameBox).CornerRadius = UDim.new(0, 6)
+
+-- Weight
+local weightBox = Instance.new("TextBox", content)
+weightBox.PlaceholderText = "5.00"
+weightBox.Text = ""
+weightBox.Size = UDim2.new(0.45, 0, 0, 30)
+weightBox.Position = UDim2.new(0.05, 0, 0, 80)
+weightBox.BackgroundColor3 = Color3.fromRGB(255, 153, 153)
+weightBox.TextColor3 = Color3.new(1,1,1)
+weightBox.Font = Enum.Font.Gotham
+weightBox.TextSize = 14
+Instance.new("UICorner", weightBox).CornerRadius = UDim.new(0, 6)
+
+-- Age
+local ageBox = weightBox:Clone()
+ageBox.PlaceholderText = "1"
+ageBox.Position = UDim2.new(0.5, 0, 0, 80)
+ageBox.BackgroundColor3 = Color3.fromRGB(255, 170, 0)
+ageBox.Parent = content
+
+-- Spawn Button
+local spawnBtn = Instance.new("TextButton", content)
+spawnBtn.Text = "SPAWN PETS"
+spawnBtn.Size = UDim2.new(0.9, 0, 0, 40)
+spawnBtn.Position = UDim2.new(0.05, 0, 0, 130)
+spawnBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+spawnBtn.TextColor3 = Color3.new(1,1,1)
+spawnBtn.Font = Enum.Font.GothamBold
+spawnBtn.TextSize = 16
+Instance.new("UICorner", spawnBtn).CornerRadius = UDim.new(0, 8)
+
+-- Spawn Logic
+spawnBtn.MouseButton1Click:Connect(function()
+	local name = nameBox.Text
+	local weight = tonumber(weightBox.Text)
+	local age = tonumber(ageBox.Text)
+
+	if name ~= "" and weight and age then
+		Spawner.SpawnPet(name, weight, age)
+	else
+		warn("Please enter valid name, weight, and age.")
+	end
+end)
+
 -- Toggle Logic with Animation
 local isOpen = true
 local openSize = UDim2.new(0, 300, 0, 260)
