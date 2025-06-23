@@ -1,172 +1,101 @@
--- Load Spawner Module
-local Spawner = loadstring(game:HttpGet("https://raw.githubusercontent.com/ataturk123/GardenSpawner/refs/heads/main/Spawner.lua"))()
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
 
--- Player & GUI Setup
-local player = game.Players.LocalPlayer
+local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
-local screenGui = Instance.new("ScreenGui", playerGui)
-screenGui.Name = "NeroPetSpawner"
+-- ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "YoutubePromo"
 screenGui.ResetOnSpawn = false
-screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+screenGui.IgnoreGuiInset = true
+screenGui.Parent = playerGui
 
--- Main Frame
-local main = Instance.new("Frame")
-main.Size = UDim2.new(0, 300, 0, 260)
-main.Position = UDim2.new(0.5, -150, 0.5, -130)
-main.BackgroundColor3 = Color3.fromRGB(255, 204, 77)
-main.BorderSizePixel = 0
-main.Parent = screenGui
-Instance.new("UICorner", main).CornerRadius = UDim.new(0, 12)
+-- Frame utama
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 350, 0, 120)
+mainFrame.Position = UDim2.new(0.5, -175, 0.85, -60)
+mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+mainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+mainFrame.BorderSizePixel = 0
+mainFrame.Parent = screenGui
 
--- Dragging
-local dragging, dragInput, dragStart, startPos
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 15)
+corner.Parent = mainFrame
 
-main.InputBegan:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 then
-		dragging = true
-		dragStart = input.Position
-		startPos = main.Position
+-- Gambar profil
+local profileImage = Instance.new("ImageLabel")
+profileImage.Size = UDim2.new(0, 60, 0, 60)
+profileImage.Position = UDim2.new(0, 10, 0, 10)
+profileImage.BackgroundTransparency = 1
+profileImage.Image = "rbxassetid://101234822718079" -- Ganti jika perlu
+profileImage.Parent = mainFrame
 
-		input.Changed:Connect(function()
-			if input.UserInputState == Enum.UserInputState.End then
-				dragging = false
-			end
-		end)
+local profileCorner = Instance.new("UICorner")
+profileCorner.CornerRadius = UDim.new(1, 0)
+profileCorner.Parent = profileImage
+
+-- Label Youtube
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Size = UDim2.new(1, -80, 0, 30)
+titleLabel.Position = UDim2.new(0, 80, 0, 10)
+titleLabel.BackgroundTransparency = 1
+titleLabel.Text = "Youtube: ScriptBlox89"
+titleLabel.TextColor3 = Color3.new(1, 1, 1)
+titleLabel.TextScaled = true
+titleLabel.Font = Enum.Font.GothamBold
+titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+titleLabel.Parent = mainFrame
+
+-- Bar abu-abu
+local grayBar = Instance.new("Frame")
+grayBar.Size = UDim2.new(1, -20, 0, 25)
+grayBar.Position = UDim2.new(0, 10, 0, 45)
+grayBar.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+grayBar.BorderSizePixel = 0
+grayBar.Parent = mainFrame
+
+local barCorner = Instance.new("UICorner")
+barCorner.CornerRadius = UDim.new(0, 10)
+barCorner.Parent = grayBar
+
+-- Bar loading
+local loadingBar = Instance.new("Frame")
+loadingBar.Size = UDim2.new(0, 0, 1, 0)
+loadingBar.Position = UDim2.new(0, 0, 0, 0)
+loadingBar.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+loadingBar.BorderSizePixel = 0
+loadingBar.Parent = grayBar
+
+local loadingCorner = Instance.new("UICorner")
+loadingCorner.CornerRadius = UDim.new(0, 10)
+loadingCorner.Parent = loadingBar
+
+-- Label Subscribe
+local subscribeLabel = Instance.new("TextLabel")
+subscribeLabel.Size = UDim2.new(1, -20, 0, 25)
+subscribeLabel.Position = UDim2.new(0, 10, 0, 80)
+subscribeLabel.BackgroundTransparency = 1
+subscribeLabel.Text = "Subscribe To ScriptBlox89"
+subscribeLabel.TextColor3 = Color3.new(1, 1, 1)
+subscribeLabel.TextScaled = true
+subscribeLabel.Font = Enum.Font.GothamBold
+subscribeLabel.TextXAlignment = Enum.TextXAlignment.Left
+subscribeLabel.Parent = mainFrame
+
+-- Loading bertahap dan berhenti di akhir
+local steps = {0.1, 0.25, 0.4, 0.6, 0.8, 1}
+local delayBetween = 0.5
+
+coroutine.wrap(function()
+	for i, progress in ipairs(steps) do
+		local tween = TweenService:Create(loadingBar, TweenInfo.new(0.5, Enum.EasingStyle.Quad), {
+			Size = UDim2.new(progress, 0, 1, 0)
+		})
+		tween:Play()
+		tween.Completed:Wait()
+		wait(delayBetween)
 	end
-end)
-
-main.InputChanged:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseMovement then
-		dragInput = input
-	end
-end)
-
-game:GetService("UserInputService").InputChanged:Connect(function(input)
-	if input == dragInput and dragging then
-		local delta = input.Position - dragStart
-		main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X,
-			startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-	end
-end)
-
--- Title Bar
-local title = Instance.new("TextLabel", main)
-title.Size = UDim2.new(1, -40, 0, 30)
-title.Position = UDim2.new(0, 10, 0, 10)
-title.Text = "NERO PET SPAWNER 2.5 🌻"
-title.Font = Enum.Font.GothamBold
-title.TextSize = 18
-title.BackgroundTransparency = 1
-title.TextColor3 = Color3.new(1,1,1)
-title.TextXAlignment = Enum.TextXAlignment.Left
-
--- Minimize Button
-local toggleBtn = Instance.new("TextButton", main)
-toggleBtn.Size = UDim2.new(0, 30, 0, 30)
-toggleBtn.Position = UDim2.new(1, -40, 0, 10)
-toggleBtn.Text = "-"
-toggleBtn.Font = Enum.Font.GothamBold
-toggleBtn.TextSize = 20
-toggleBtn.TextColor3 = Color3.new(1,1,1)
-toggleBtn.BackgroundColor3 = Color3.fromRGB(200, 100, 0)
-Instance.new("UICorner", toggleBtn).CornerRadius = UDim.new(0, 6)
-
--- Container for the rest of content
-local content = Instance.new("Frame", main)
-content.Size = UDim2.new(1, 0, 0, 200)
-content.Position = UDim2.new(0, 0, 0, 50)
-content.BackgroundTransparency = 1
-
--- Tabs
-local petTab = Instance.new("TextButton", content)
-petTab.Size = UDim2.new(0.45, 0, 0, 30)
-petTab.Position = UDim2.new(0.05, 0, 0, 0)
-petTab.Text = "PETS"
-petTab.BackgroundColor3 = Color3.fromRGB(255, 128, 0)
-petTab.Font = Enum.Font.GothamBold
-petTab.TextColor3 = Color3.new(1,1,1)
-Instance.new("UICorner", petTab).CornerRadius = UDim.new(0, 6)
-
-local seedTab = petTab:Clone()
-seedTab.Text = "SEEDS"
-seedTab.Position = UDim2.new(0.5, 0, 0, 0)
-seedTab.Parent = content
-
--- Pet Name
-local nameBox = Instance.new("TextBox", content)
-nameBox.PlaceholderText = "Raccoon"
-nameBox.Text = ""
-nameBox.Size = UDim2.new(0.9, 0, 0, 30)
-nameBox.Position = UDim2.new(0.05, 0, 0, 40)
-nameBox.BackgroundColor3 = Color3.fromRGB(255, 153, 102)
-nameBox.TextColor3 = Color3.new(1,1,1)
-nameBox.Font = Enum.Font.Gotham
-nameBox.TextSize = 14
-Instance.new("UICorner", nameBox).CornerRadius = UDim.new(0, 6)
-
--- Weight
-local weightBox = Instance.new("TextBox", content)
-weightBox.PlaceholderText = "5.00"
-weightBox.Text = ""
-weightBox.Size = UDim2.new(0.45, 0, 0, 30)
-weightBox.Position = UDim2.new(0.05, 0, 0, 80)
-weightBox.BackgroundColor3 = Color3.fromRGB(255, 153, 153)
-weightBox.TextColor3 = Color3.new(1,1,1)
-weightBox.Font = Enum.Font.Gotham
-weightBox.TextSize = 14
-Instance.new("UICorner", weightBox).CornerRadius = UDim.new(0, 6)
-
--- Age
-local ageBox = weightBox:Clone()
-ageBox.PlaceholderText = "1"
-ageBox.Position = UDim2.new(0.5, 0, 0, 80)
-ageBox.BackgroundColor3 = Color3.fromRGB(255, 170, 0)
-ageBox.Parent = content
-
--- Spawn Button
-local spawnBtn = Instance.new("TextButton", content)
-spawnBtn.Text = "SPAWN PETS"
-spawnBtn.Size = UDim2.new(0.9, 0, 0, 40)
-spawnBtn.Position = UDim2.new(0.05, 0, 0, 130)
-spawnBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
-spawnBtn.TextColor3 = Color3.new(1,1,1)
-spawnBtn.Font = Enum.Font.GothamBold
-spawnBtn.TextSize = 16
-Instance.new("UICorner", spawnBtn).CornerRadius = UDim.new(0, 8)
-
--- Spawn Logic
-spawnBtn.MouseButton1Click:Connect(function()
-	local name = nameBox.Text
-	local weight = tonumber(weightBox.Text)
-	local age = tonumber(ageBox.Text)
-
-	if name ~= "" and weight and age then
-		Spawner.SpawnPet(name, weight, age)
-	else
-		warn("Please enter valid name, weight, and age.")
-	end
-end)
-
--- Toggle Logic with Animation
-local isOpen = true
-local openSize = UDim2.new(0, 300, 0, 260)
-local closedSize = UDim2.new(0, 300, 0, 50)
-
-toggleBtn.MouseButton1Click:Connect(function()
-	isOpen = not isOpen
-	toggleBtn.Text = isOpen and "-" or "+"
-
-	local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-	local goal = { Size = isOpen and openSize or closedSize }
-
-	local tween = TweenService:Create(main, tweenInfo, goal)
-	tween:Play()
-
-	if isOpen then
-		task.wait(0.3)
-		content.Visible = true
-	else
-		content.Visible = false
-	end
-end)
+	-- Tidak ada aksi lanjutan, loading screen tetap tampil di 100%
+end)()
